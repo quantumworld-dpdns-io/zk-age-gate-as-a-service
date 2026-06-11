@@ -54,7 +54,7 @@ describe('Post-Quantum Cryptography', () => {
       const classicalKey = new Uint8Array(32);
       crypto.getRandomValues(classicalKey);
 
-      const { publicKey: pqcPublic, privateKey: pqcPrivate } =
+      const { privateKey: pqcPrivate } =
         await generatePQCKeyPair('DILITHIUM3');
       const message = new Uint8Array([1, 2, 3, 4, 5]);
 
