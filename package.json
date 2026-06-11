@@ -1,0 +1,76 @@
+{
+  "name": "zk-age-gate",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Zero-Knowledge Age Verification via Verifiable Credentials & ZKP — quantum-resistant, privacy-preserving, production-ready",
+  "author": "quantumworld-dpdns-io",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "wrangler dev",
+    "build": "tsc --noEmit && wrangler deploy --dry-run --outdir=dist",
+    "deploy": "wrangler deploy",
+    "deploy:staging": "wrangler deploy --env staging",
+    "deploy:production": "wrangler deploy --env production",
+    "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:security": "vitest run tests/security",
+    "test:e2e": "vitest run tests/e2e",
+    "test:coverage": "vitest run --coverage",
+    "test:robot": "robot tests/robot/testcases/",
+    "test:robot:owasp": "robot tests/robot/testcases/test_a0*.robot",
+    "lint": "eslint src/ tests/ --ext .ts",
+    "lint:fix": "eslint src/ tests/ --ext .ts --fix",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"circuits/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\" \"circuits/**/*.ts\"",
+    "typecheck": "tsc --noEmit",
+    "types": "wrangler types",
+    "check:startup": "wrangler check startup",
+    "tail": "wrangler tail",
+    "secret:put": "wrangler secret put",
+    "secret:list": "wrangler secret list",
+    "d1:create": "wrangler d1 create zk-age-gate-db",
+    "d1:migrate": "wrangler d1 migrations apply zk-age-gate-db",
+    "kv:create": "wrangler kv namespace create CACHE",
+    "r2:create": "wrangler r2 bucket create artifacts",
+    "vectorize:create": "wrangler vectorize create search-index --dimensions 768 --metric cosine",
+    "clean": "rm -rf dist coverage node_modules/.cache",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "hono": "^4.4.0",
+    "zod": "^3.23.0",
+    "@noble/hashes": "^1.4.0",
+    "@noble/ciphers": "^0.6.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20240806.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0",
+    "vitest": "^2.0.0",
+    "@cloudflare/vitest-pool-workers": "^0.4.0",
+    "wrangler": "^3.70.0",
+    "@types/node": "^20.14.0",
+    "npm-run-all": "^4.1.5",
+    "husky": "^9.1.0",
+    "lint-staged": "^15.2.0",
+    "commitlint": "^19.3.0",
+    "@commitlint/config-conventional": "^19.2.0"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  }
+}
