@@ -26,7 +26,7 @@ describe('Post-Quantum Cryptography', () => {
 
   describe('pqcSign and pqcVerify', () => {
     it('should sign and verify', async () => {
-      const { publicKey, privateKey } = await generatePQCKeyPair('DILITHIUM3');
+      const { privateKey } = await generatePQCKeyPair('DILITHIUM3');
       const message = new Uint8Array([1, 2, 3, 4, 5]);
 
       const signature = await pqcSign(privateKey, message, 'DILITHIUM3');
