@@ -59,9 +59,9 @@ export class StorageManager {
     values: number[],
     topK: number = 10,
     namespace?: string,
-  ): Promise<VectorizeVector[]> {
+  ): Promise<Record<string, unknown>[]> {
     const result = await this.config.searchIndex.query(values, { topK, namespace });
-    return result.vectors || [];
+    return result.matches || [];
   }
 }
 
