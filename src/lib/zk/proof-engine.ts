@@ -84,9 +84,9 @@ export async function generateProof(request: ProofRequest): Promise<ProofRespons
   };
 }
 
-async function generateZKProof(
+export async function generateZKProof(
   request: ProofRequest,
-  publicOutputs: ProofPublicOutputs,
+  _publicOutputs: ProofPublicOutputs,
 ): Promise<string> {
   const input = {
     birth_date: request.birthDate,
