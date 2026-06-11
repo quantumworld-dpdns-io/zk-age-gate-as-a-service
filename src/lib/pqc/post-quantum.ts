@@ -111,10 +111,9 @@ export async function pqcSign(
 ): Promise<PQCSignatureData> {
   const algo = PQC_ALGORITHMS[algorithm];
   if (!algo) throw new Error(`Unknown algorithm: ${algorithm}`);
-  const signatureSize = algo.signatureSize || 3293;
+  const signatureSize = algo.signatureSize ?? 3293;
   const signature = new Uint8Array(signatureSize);
 
-  const encoder = new TextEncoder();
   const msgHash = await crypto.subtle.digest('SHA-256', message);
   const hashArray = new Uint8Array(msgHash);
 
@@ -138,7 +137,6 @@ export async function pqcVerify(
     return false;
   }
 
-  const encoder = new TextEncoder();
   const msgHash = await crypto.subtle.digest('SHA-256', message);
   const hashArray = new Uint8Array(msgHash);
 
@@ -157,7 +155,7 @@ export async function pqcEncapsulate(
 ): Promise<{ ciphertext: Uint8Array; sharedSecret: Uint8Array }> {
   const algo = PQC_ALGORITHMS[algorithm];
   if (!algo) throw new Error(`Unknown algorithm: ${algorithm}`);
-  const ciphertextSize = algo.ciphertextSize || 1088;
+  const ciphertextSize = algo.ciphertextSize ?? 1088;
   const ciphertext = new Uint8Array(ciphertextSize);
   const sharedSecret = new Uint8Array(32);
 
