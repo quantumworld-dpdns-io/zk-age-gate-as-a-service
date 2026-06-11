@@ -99,8 +99,8 @@ export function handleMCPRequest(method: string, params: Record<string, unknown>
     case 'resources/list':
       return { resources: MCP_RESOURCES };
     case 'tools/call': {
-      const toolName = params.name as string;
-      const args = params.arguments as Record<string, unknown>;
+      const toolName = params['name'] as string;
+      const args = params['arguments'] as Record<string, unknown>;
       return handleToolCall(toolName, args);
     }
     default:
@@ -118,8 +118,8 @@ function handleToolCall(name: string, args: Record<string, unknown>): unknown {
             text: JSON.stringify({
               proofId: crypto.randomUUID(),
               status: 'generated',
-              birthDate: args.birthDate,
-              minAge: args.minAge,
+              birthDate: args['birthDate'],
+              minAge: args['minAge'],
             }),
           },
         ],
@@ -131,7 +131,7 @@ function handleToolCall(name: string, args: Record<string, unknown>): unknown {
             type: 'text',
             text: JSON.stringify({
               valid: true,
-              proofId: args.proofId,
+              proofId: args['proofId'],
               verifiedAt: new Date().toISOString(),
             }),
           },
@@ -143,8 +143,8 @@ function handleToolCall(name: string, args: Record<string, unknown>): unknown {
           {
             type: 'text',
             text: JSON.stringify({
-              bits: args.bits,
-              data: Array.from({ length: (args.bits as number) || 8 }, () =>
+              bits: args['bits'],
+              data: Array.from({ length: (args['bits'] as number) || 8 }, () =>
                 Math.random() > 0.5 ? '1' : '0',
               ).join(''),
             }),
