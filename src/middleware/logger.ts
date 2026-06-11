@@ -1,7 +1,7 @@
 import { Context, Next } from 'hono';
 
 export function logger() {
-  return async (c: Context, next: Next): Promise<void> => {
+  return async (c: Context, next: Next) => {
     const start = Date.now();
     await next();
     const duration = Date.now() - start;
