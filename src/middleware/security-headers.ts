@@ -1,6 +1,6 @@
-import type { Context, Next } from 'hono';
+import { Context, Next } from 'hono';
 
-export async function securityHeaders(): Promise<void> {
+export async function securityHeaders() {
   return async (c: Context, next: Next): Promise<void> => {
     await next();
     c.header('X-Content-Type-Options', 'nosniff');
