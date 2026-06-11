@@ -1,11 +1,8 @@
-import type { Context } from 'hono';
-import type { StatusCode } from 'hono/utils/http-status';
+import { Context } from 'hono';
+import { StatusCode } from 'hono/utils/http-status';
 
-export function errorHandler(): (err: Error, c: Context) => Response | Promise<Response> {
-  return (err: Error, c: Context): Response | {
-    status: StatusCode;
-    body: { error: string; message: string; requestId: string | undefined };
-  } => {
+export function errorHandler() {
+  return (err: Error, c: Context): Response => {
     console.error('Unhandled error:', err);
 
     const status = 500 as StatusCode;
