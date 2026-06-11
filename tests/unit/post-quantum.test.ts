@@ -2,11 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   generatePQCKeyPair,
   pqcSign,
-  pqcVerify,
   pqcEncapsulate,
   pqcDecapsulate,
   hybridSign,
-  hybridVerify,
   deriveQuantumKey,
   PQC_ALGORITHMS,
 } from '../../src/lib/pqc/post-quantum';
