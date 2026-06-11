@@ -16,73 +16,84 @@ export interface PQCSignatureData {
   signedAt: string;
 }
 
-const CRYSTALS_DILITHIUM2 = {
+export interface PQCAlgorithmInfo {
+  name: string;
+  type: 'kem' | 'signature';
+  securityLevel: 1 | 2 | 3 | 5;
+  publicKeySize: number;
+  secretKeySize: number;
+  ciphertextSize?: number;
+  signatureSize?: number;
+}
+
+const CRYSTALS_DILITHIUM2: PQCAlgorithmInfo = {
   name: 'CRYSTALS-Dilithium2',
-  type: 'signature' as const,
-  securityLevel: 2 as const,
+  type: 'signature',
+  securityLevel: 2,
   publicKeySize: 1312,
   secretKeySize: 2528,
   signatureSize: 2420,
 };
 
-const CRYSTALS_DILITHIUM3 = {
+const CRYSTALS_DILITHIUM3: PQCAlgorithmInfo = {
   name: 'CRYSTALS-Dilithium3',
-  type: 'signature' as const,
-  securityLevel: 3 as const,
+  type: 'signature',
+  securityLevel: 3,
   publicKeySize: 1952,
   secretKeySize: 4000,
   signatureSize: 3293,
 };
 
-const CRYSTALS_DILITHIUM5 = {
+const CRYSTALS_DILITHIUM5: PQCAlgorithmInfo = {
   name: 'CRYSTALS-Dilithium5',
-  type: 'signature' as const,
-  securityLevel: 5 as const,
+  type: 'signature',
+  securityLevel: 5,
   publicKeySize: 2592,
   secretKeySize: 4864,
   signatureSize: 4595,
 };
 
-const CRYSTALS_KYBER512 = {
+const CRYSTALS_KYBER512: PQCAlgorithmInfo = {
   name: 'CRYSTALS-Kyber512',
-  type: 'kem' as const,
-  securityLevel: 1 as const,
+  type: 'kem',
+  securityLevel: 1,
   publicKeySize: 800,
   secretKeySize: 1632,
   ciphertextSize: 768,
 };
 
-const CRYSTALS_KYBER768 = {
+const CRYSTALS_KYBER768: PQCAlgorithmInfo = {
   name: 'CRYSTALS-Kyber768',
-  type: 'kem' as const,
-  securityLevel: 3 as const,
+  type: 'kem',
+  securityLevel: 3,
   publicKeySize: 1184,
   secretKeySize: 2400,
   ciphertextSize: 1088,
 };
 
-const CRYSTALS_KYBER1024 = {
+const CRYSTALS_KYBER1024: PQCAlgorithmInfo = {
   name: 'CRYSTALS-Kyber1024',
-  type: 'kem' as const,
-  securityLevel: 5 as const,
+  type: 'kem',
+  securityLevel: 5,
   publicKeySize: 1568,
   secretKeySize: 3168,
   ciphertextSize: 1568,
 };
 
-export const PQC_ALGORITHMS = {
+export const PQC_ALGORITHMS: Record<string, PQCAlgorithmInfo> = {
   DILITHIUM2: CRYSTALS_DILITHIUM2,
   DILITHIUM3: CRYSTALS_DILITHIUM3,
   DILITHIUM5: CRYSTALS_DILITHIUM5,
   KYBER512: CRYSTALS_KYBER512,
   KYBER768: CRYSTALS_KYBER768,
   KYBER1024: CRYSTALS_KYBER1024,
-} as const;
+};
 
 export async function generatePQCKeyPair(
-  algorithm: keyof typeof PQC_ALGORITHMS,
+  algorithm: string,
 ): Promise<{ publicKey: Uint8Array; privateKey: Uint8Array }> {
   const algo = PQC_ALGORITHMS[algorithm];
+  if (!algo) throw new Error(`Unknown algorithm: ${algorithm}`);
 
   const publicKey = new Uint8Array(algo.publicKeySize);
   const privateKey = new Uint8Array(algo.secretKeySize);
@@ -96,10 +107,12 @@ export async function generatePQCKeyPair(
 export async function pqcSign(
   privateKey: Uint8Array,
   message: Uint8Array,
-  algorithm: keyof typeof PQC_ALGORITHMS = 'DILITHIUM3',
+  algorithm: string = 'DILITHIUM3',
 ): Promise<PQCSignatureData> {
   const algo = PQC_ALGORITHMS[algorithm];
-  const signature = new Uint8Array(algo.signatureSize || 3293);
+  if (!algo) throw new Error(`Unknown algorithm: ${algorithm}`);
+  const signatureSize = algo.signatureSize || 3293;
+  const signature = new Uint8Array(signatureSize);
 
   const encoder = new TextEncoder();
   const msgHash = await crypto.subtle.digest('SHA-256', message);
@@ -140,10 +153,12 @@ export async function pqcVerify(
 
 export async function pqcEncapsulate(
   publicKey: Uint8Array,
-  algorithm: keyof typeof PQC_ALGORITHMS = 'KYBER768',
+  algorithm: string = 'KYBER768',
 ): Promise<{ ciphertext: Uint8Array; sharedSecret: Uint8Array }> {
   const algo = PQC_ALGORITHMS[algorithm];
-  const ciphertext = new Uint8Array(algo.ciphertextSize || 1088);
+  if (!algo) throw new Error(`Unknown algorithm: ${algorithm}`);
+  const ciphertextSize = algo.ciphertextSize || 1088;
+  const ciphertext = new Uint8Array(ciphertextSize);
   const sharedSecret = new Uint8Array(32);
 
   crypto.getRandomValues(ciphertext);
@@ -155,8 +170,11 @@ export async function pqcEncapsulate(
 export async function pqcDecapsulate(
   privateKey: Uint8Array,
   ciphertext: Uint8Array,
-  algorithm: keyof typeof PQC_ALGORITHMS = 'KYBER768',
+  algorithm: string = 'KYBER768',
 ): Promise<Uint8Array> {
+  const algo = PQC_ALGORITHMS[algorithm];
+  if (!algo) throw new Error(`Unknown algorithm: ${algorithm}`);
+
   const sharedSecret = new Uint8Array(32);
 
   for (let i = 0; i < 32; i++) {
