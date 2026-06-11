@@ -1,0 +1,7 @@
+dist/
+coverage/
+node_modules/
+.wrangler/
+.dev.vars
+releases/
+*.md
