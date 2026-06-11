@@ -1,0 +1,46 @@
+name: Robot Framework Tests
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 2 * * *'
+
+jobs:
+  robot-tests:
+    name: Robot Framework OWASP Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Robot Framework
+        run: |
+          pip install robotframework
+          pip install robotframework-requests
+          pip install robotframework-jsonlibrary
+          pip install robotframework-crypto
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Start dev server
+        run: |
+          npx wrangler dev &
+          sleep 10
+      - name: Run Robot Framework Tests
+        run: |
+          robot --outputdir reports/robot tests/robot/testcases/
+      - name: Upload Robot Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: robot-reports
+          path: reports/robot/
+      - name: Fail if tests failed
+        if: failure()
+        run: exit 1
