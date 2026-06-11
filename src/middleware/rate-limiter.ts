@@ -1,8 +1,8 @@
-import type { Context, Next } from 'hono';
+import { Context, Next } from 'hono';
 
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
-export async function rateLimiter(): Promise<void> {
+export function rateLimiter() {
   return async (c: Context, next: Next): Promise<void> => {
     const ip = c.req.header('CF-Connecting-IP') || 'unknown';
     const now = Date.now();
@@ -17,7 +17,8 @@ export async function rateLimiter(): Promise<void> {
         c.header('X-RateLimit-Limit', String(maxRequests));
         c.header('X-RateLimit-Remaining', '0');
         c.header('X-RateLimit-Reset', String(Math.ceil(entry.resetAt / 1000)));
-        return c.json({ error: 'Rate limit exceeded' }, 429);
+        c.json({ error: 'Rate limit exceeded' }, 429);
+        return;
       }
       entry.count++;
     } else {
