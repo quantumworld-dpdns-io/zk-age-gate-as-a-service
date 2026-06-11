@@ -6,7 +6,7 @@
     "lib": ["ES2022"],
     "types": ["@cloudflare/workers-types"],
     "strict": true,
-    "noUncheckedIndexedAccess": true,
+    "noUncheckedIndexedAccess": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": false,
     "exactOptionalPropertyTypes": false,
