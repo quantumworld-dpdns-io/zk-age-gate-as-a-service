@@ -1,0 +1,4 @@
+# Local development secrets (do not commit)
+TURNSTILE_SECRET=local-dev-turnstile-secret
+JWT_SECRET=local-dev-jwt-secret-min-32-chars
+API_KEY_SECRET=local-dev-api-key-secret

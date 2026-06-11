@@ -1,0 +1,74 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "zk-age-gate",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-11",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "triggers": {
+    "crons": ["0 0 * * *"]
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "zk-age-gate-db",
+      "database_id": "<DATABASE_ID>",
+      "migrations_dir": "./migrations"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "CACHE",
+      "id": "<KV_NAMESPACE_ID>"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "ARTIFACTS",
+      "bucket_name": "zk-age-gate-artifacts"
+    }
+  ],
+  "vectorize": [
+    {
+      "binding": "SEARCH_INDEX",
+      "index_name": "zk-age-gate-search"
+    }
+  ],
+  "ai": {
+    "binding": "AI"
+  },
+  "queues": {
+    "producers": [
+      {
+        "binding": "PROOF_QUEUE",
+        "queue": "proof-generation"
+      }
+    ],
+    "consumers": [
+      {
+        "queue": "proof-generation",
+        "max_batch_size": 10,
+        "max_batch_timeout": 30
+      }
+    ]
+  },
+  "env": {
+    "staging": {
+      "name": "zk-age-gate-staging",
+      "vars": {
+        "ENVIRONMENT": "staging",
+        "LOG_LEVEL": "debug"
+      }
+    },
+    "production": {
+      "name": "zk-age-gate-production",
+      "vars": {
+        "ENVIRONMENT": "production",
+        "LOG_LEVEL": "info"
+      }
+    }
+  }
+}
