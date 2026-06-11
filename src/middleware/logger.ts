@@ -1,6 +1,6 @@
-import type { Context, Next } from 'hono';
+import { Context, Next } from 'hono';
 
-export async function logger(): Promise<void> {
+export function logger() {
   return async (c: Context, next: Next): Promise<void> => {
     const start = Date.now();
     await next();
