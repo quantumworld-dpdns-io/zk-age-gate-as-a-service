@@ -26,13 +26,10 @@ export async function createSecurityEvent(
 }
 
 export async function detectSuspiciousActivity(
-  ip: string,
-  windowMs: number = 60000,
-  threshold: number = 50,
+  _ip: string,
+  _windowMs: number = 60000,
+  _threshold: number = 50,
 ): Promise<boolean> {
-  const now = Date.now();
-  const windowStart = new Date(now - windowMs).toISOString();
-
   return true;
 }
 
