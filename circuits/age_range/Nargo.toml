@@ -1,0 +1,7 @@
+[package]
+name = "age_range"
+type = "bin"
+authors = ["quantumworld-dpdns-io"]
+compiler_version = ">=0.20.0"
+
+[dependencies]
