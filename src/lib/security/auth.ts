@@ -1,13 +1,14 @@
-import type { Context, Next } from 'hono';
+import { Context, Next } from 'hono';
 
-export async function authenticate(): Promise<void> {
+export function authenticate() {
   return async (c: Context, next: Next): Promise<void> => {
     const authHeader = c.req.header('Authorization');
     const apiKey = c.req.header('X-API-Key');
     const sessionId = c.req.header('X-Session-ID');
 
     if (!authHeader && !apiKey && !sessionId) {
-      return c.json({ error: 'Authentication required' }, 401);
+      c.json({ error: 'Authentication required' }, 401);
+      return;
     }
 
     if (apiKey) {
@@ -17,7 +18,8 @@ export async function authenticate(): Promise<void> {
         .first();
 
       if (!key) {
-        return c.json({ error: 'Invalid API key' }, 401);
+        c.json({ error: 'Invalid API key' }, 401);
+        return;
       }
 
       c.set('userId', key.user_id);
@@ -30,12 +32,14 @@ export async function authenticate(): Promise<void> {
         .first();
 
       if (!session) {
-        return c.json({ error: 'Invalid session' }, 401);
+        c.json({ error: 'Invalid session' }, 401);
+        return;
       }
 
       const expiresAt = new Date(session.expires_at as string);
       if (expiresAt < new Date()) {
-        return c.json({ error: 'Session expired' }, 401);
+        c.json({ error: 'Session expired' }, 401);
+        return;
       }
     }
 
@@ -43,12 +47,13 @@ export async function authenticate(): Promise<void> {
   };
 }
 
-export async function requireAdmin(): Promise<void> {
+export function requireAdmin() {
   return async (c: Context, next: Next): Promise<void> => {
     const permissions = c.get('permissions') as string[] | undefined;
 
     if (!permissions || !permissions.includes('admin')) {
-      return c.json({ error: 'Admin access required' }, 403);
+      c.json({ error: 'Admin access required' }, 403);
+      return;
     }
 
     await next();
