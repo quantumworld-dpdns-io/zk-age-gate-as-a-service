@@ -17,81 +17,76 @@ const verifyProofSchema = z.object({
   proof: z.string(),
 });
 
-proofRoutes.post(
-  '/generate',
-  zValidator('json', generateProofSchema),
-  async (c) => {
-    const data = c.req.valid('json');
-    const id = crypto.randomUUID();
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+proofRoutes.post('/generate', zValidator('json', generateProofSchema), async (c) => {
+  const data = c.req.valid('json');
+  const id = crypto.randomUUID();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
-    const proofRecord = {
-      id,
-      circuitId: data.circuitId || 'age_range_v1',
-      proof: `mock_proof_${id}`,
-      publicOutputs: JSON.stringify({
-        ageVerified: true,
-        minAge: data.minAge,
-        countryCode: data.countryCode,
-        timestamp: Math.floor(now.getTime() / 1000),
-      }),
-      status: 'active' as const,
-      createdAt: now.toISOString(),
-      expiresAt: expiresAt.toISOString(),
-    };
+  const proofRecord = {
+    id,
+    circuitId: data.circuitId || 'age_range_v1',
+    proof: `mock_proof_${id}`,
+    publicOutputs: JSON.stringify({
+      ageVerified: true,
+      minAge: data.minAge,
+      countryCode: data.countryCode,
+      timestamp: Math.floor(now.getTime() / 1000),
+    }),
+    status: 'active' as const,
+    createdAt: now.toISOString(),
+    expiresAt: expiresAt.toISOString(),
+  };
 
-    await c.env.DB.prepare(
-      'INSERT INTO proofs (id, circuit_id, proof, public_outputs, status, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+  await c.env.DB.prepare(
+    'INSERT INTO proofs (id, circuit_id, proof, public_outputs, status, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+  )
+    .bind(
+      proofRecord.id,
+      proofRecord.circuitId,
+      proofRecord.proof,
+      proofRecord.publicOutputs,
+      proofRecord.status,
+      proofRecord.createdAt,
+      proofRecord.expiresAt,
     )
-      .bind(
-        proofRecord.id,
-        proofRecord.circuitId,
-        proofRecord.proof,
-        proofRecord.publicOutputs,
-        proofRecord.status,
-        proofRecord.createdAt,
-        proofRecord.expiresAt,
-      )
-      .run();
+    .run();
 
-    return c.json({
+  return c.json(
+    {
       id: proofRecord.id,
       proof: proofRecord.proof,
       publicOutputs: JSON.parse(proofRecord.publicOutputs),
       circuitId: proofRecord.circuitId,
       createdAt: proofRecord.createdAt,
       expiresAt: proofRecord.expiresAt,
-    }, 201);
-  },
-);
+    },
+    201,
+  );
+});
 
-proofRoutes.post(
-  '/verify',
-  zValidator('json', verifyProofSchema),
-  async (c) => {
-    const data = c.req.valid('json');
+proofRoutes.post('/verify', zValidator('json', verifyProofSchema), async (c) => {
+  const data = c.req.valid('json');
 
-    const proof = await c.env.DB.prepare('SELECT * FROM proofs WHERE id = ?')
-      .bind(data.proofId)
-      .first();
+  const proof = await c.env.DB.prepare('SELECT * FROM proofs WHERE id = ?')
+    .bind(data.proofId)
+    .first();
 
-    if (!proof) {
-      return c.json({ error: 'Proof not found' }, 404);
-    }
+  if (!proof) {
+    return c.json({ error: 'Proof not found' }, 404);
+  }
 
-    const now = new Date();
-    const expiresAt = new Date(proof.expires_at as string);
-    const isValid = proof.status === 'active' && expiresAt > now;
+  const now = new Date();
+  const expiresAt = new Date(proof.expires_at as string);
+  const isValid = proof.status === 'active' && expiresAt > now;
 
-    return c.json({
-      valid: isValid,
-      proofId: proof.id,
-      verifiedAt: now.toISOString(),
-      publicOutputs: JSON.parse(proof.public_outputs as string),
-    });
-  },
-);
+  return c.json({
+    valid: isValid,
+    proofId: proof.id,
+    verifiedAt: now.toISOString(),
+    publicOutputs: JSON.parse(proof.public_outputs as string),
+  });
+});
 
 proofRoutes.get('/:id', async (c) => {
   const id = c.req.param('id');
@@ -114,9 +109,7 @@ proofRoutes.get('/:id', async (c) => {
 proofRoutes.delete('/:id', async (c) => {
   const id = c.req.param('id');
 
-  await c.env.DB.prepare('UPDATE proofs SET status = ? WHERE id = ?')
-    .bind('revoked', id)
-    .run();
+  await c.env.DB.prepare('UPDATE proofs SET status = ? WHERE id = ?').bind('revoked', id).run();
 
   return c.json({ message: 'Proof revoked', proofId: id });
 });

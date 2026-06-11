@@ -56,7 +56,8 @@ describe('Post-Quantum Cryptography', () => {
       const classicalKey = new Uint8Array(32);
       crypto.getRandomValues(classicalKey);
 
-      const { publicKey: pqcPublic, privateKey: pqcPrivate } = await generatePQCKeyPair('DILITHIUM3');
+      const { publicKey: pqcPublic, privateKey: pqcPrivate } =
+        await generatePQCKeyPair('DILITHIUM3');
       const message = new Uint8Array([1, 2, 3, 4, 5]);
 
       const hybridSig = await hybridSign(classicalKey, pqcPrivate, message);
@@ -65,7 +66,10 @@ describe('Post-Quantum Cryptography', () => {
       const msgHash = new Uint8Array(await crypto.subtle.digest('SHA-256', message));
       let classicalValid = true;
       for (let i = 0; i < 64; i++) {
-        if (hybridSig.classical.signature[i] !== (msgHash[i % msgHash.length] ^ classicalKey[i % classicalKey.length])) {
+        if (
+          hybridSig.classical.signature[i] !==
+          (msgHash[i % msgHash.length] ^ classicalKey[i % classicalKey.length])
+        ) {
           classicalValid = false;
           break;
         }

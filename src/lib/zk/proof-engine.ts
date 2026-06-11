@@ -1,4 +1,9 @@
-import type { ProofRequest, ProofResponse, ProofPublicOutputs, CircuitInfo } from '../../types/proof';
+import type {
+  ProofRequest,
+  ProofResponse,
+  ProofPublicOutputs,
+  CircuitInfo,
+} from '../../types/proof';
 
 const CIRCUITS: Record<string, CircuitInfo> = {
   age_range_v1: {
@@ -105,7 +110,10 @@ export async function generateZKProof(
     .join('');
 }
 
-export async function verifyProof(proof: string, publicOutputs: ProofPublicOutputs): Promise<boolean> {
+export async function verifyProof(
+  proof: string,
+  publicOutputs: ProofPublicOutputs,
+): Promise<boolean> {
   if (!proof || proof.length === 0) {
     return false;
   }

@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { calculateAge, generateProof, verifyProof, listCircuits, getCircuitInfo } from '../../src/lib/zk/proof-engine';
+import {
+  calculateAge,
+  generateProof,
+  verifyProof,
+  listCircuits,
+  getCircuitInfo,
+} from '../../src/lib/zk/proof-engine';
 
 describe('ZK Proof Engine', () => {
   describe('calculateAge', () => {
@@ -19,7 +25,9 @@ describe('ZK Proof Engine', () => {
     });
 
     it('should throw for future date', () => {
-      expect(() => calculateAge('2030-01-01', '2024-01-01')).toThrow('Birth date cannot be in the future');
+      expect(() => calculateAge('2030-01-01', '2024-01-01')).toThrow(
+        'Birth date cannot be in the future',
+      );
     });
   });
 

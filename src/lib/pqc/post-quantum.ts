@@ -141,7 +141,10 @@ export async function pqcVerify(
   const hashArray = new Uint8Array(msgHash);
 
   for (let i = 0; i < signatureData.signature.length; i++) {
-    if (signatureData.signature[i] !== (hashArray[i % hashArray.length] ^ publicKey[i % publicKey.length])) {
+    if (
+      signatureData.signature[i] !==
+      (hashArray[i % hashArray.length] ^ publicKey[i % publicKey.length])
+    ) {
       return false;
     }
   }
@@ -195,7 +198,8 @@ export async function hybridSign(
   const hashArray = new Uint8Array(msgHash);
 
   for (let i = 0; i < 64; i++) {
-    classicalSignature[i] = hashArray[i % hashArray.length] ^ classicalPrivateKey[i % classicalPrivateKey.length];
+    classicalSignature[i] =
+      hashArray[i % hashArray.length] ^ classicalPrivateKey[i % classicalPrivateKey.length];
   }
 
   const pqcSignature = await pqcSign(pqcPrivateKey, message);

@@ -26,20 +26,32 @@ export class StorageManager {
   }
 
   async dbQuery<T>(sql: string, ...params: unknown[]): Promise<T[]> {
-    const result = await this.config.db.prepare(sql).bind(...params).all();
+    const result = await this.config.db
+      .prepare(sql)
+      .bind(...params)
+      .all();
     return result.results as T[];
   }
 
   async dbFirst<T>(sql: string, ...params: unknown[]): Promise<T | null> {
-    const result = await this.config.db.prepare(sql).bind(...params).first();
+    const result = await this.config.db
+      .prepare(sql)
+      .bind(...params)
+      .first();
     return result as T | null;
   }
 
   async dbRun(sql: string, ...params: unknown[]): Promise<D1Result> {
-    return await this.config.db.prepare(sql).bind(...params).run();
+    return await this.config.db
+      .prepare(sql)
+      .bind(...params)
+      .run();
   }
 
-  async r2Put(key: string, data: ReadableStream | ArrayBuffer | Uint8Array | string): Promise<void> {
+  async r2Put(
+    key: string,
+    data: ReadableStream | ArrayBuffer | Uint8Array | string,
+  ): Promise<void> {
     await this.config.artifacts.put(key, data);
   }
 

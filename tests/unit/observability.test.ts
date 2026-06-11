@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { Tracer, recordMetric, getMetrics, clearMetrics } from '../../src/lib/observability/tracing';
+import {
+  Tracer,
+  recordMetric,
+  getMetrics,
+  clearMetrics,
+} from '../../src/lib/observability/tracing';
 
 describe('Observability', () => {
   describe('Tracer', () => {

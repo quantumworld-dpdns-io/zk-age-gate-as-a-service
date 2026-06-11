@@ -9,27 +9,26 @@ const createSessionSchema = z.object({
   apiKey: z.string().min(1),
 });
 
-authRoutes.post(
-  '/session',
-  zValidator('json', createSessionSchema),
-  async (c) => {
-    const data = c.req.valid('json');
-    const sessionId = crypto.randomUUID();
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 60 * 60 * 1000);
+authRoutes.post('/session', zValidator('json', createSessionSchema), async (c) => {
+  const data = c.req.valid('json');
+  const sessionId = crypto.randomUUID();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 60 * 60 * 1000);
 
-    await c.env.DB.prepare(
-      'INSERT INTO sessions (id, api_key_hash, created_at, expires_at) VALUES (?, ?, ?, ?)',
-    )
-      .bind(sessionId, await hashApiKey(data.apiKey), now.toISOString(), expiresAt.toISOString())
-      .run();
+  await c.env.DB.prepare(
+    'INSERT INTO sessions (id, api_key_hash, created_at, expires_at) VALUES (?, ?, ?, ?)',
+  )
+    .bind(sessionId, await hashApiKey(data.apiKey), now.toISOString(), expiresAt.toISOString())
+    .run();
 
-    return c.json({
+  return c.json(
+    {
       sessionId,
       expiresAt: expiresAt.toISOString(),
-    }, 201);
-  },
-);
+    },
+    201,
+  );
+});
 
 authRoutes.delete('/session', async (c) => {
   const sessionId = c.req.header('X-Session-ID');

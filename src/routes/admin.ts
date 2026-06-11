@@ -24,7 +24,9 @@ adminRoutes.get('/proofs', async (c) => {
   const limit = Math.min(parseInt(c.req.query('limit') || '20'), 100);
   const offset = (page - 1) * limit;
 
-  const proofs = await c.env.DB.prepare('SELECT * FROM proofs ORDER BY created_at DESC LIMIT ? OFFSET ?')
+  const proofs = await c.env.DB.prepare(
+    'SELECT * FROM proofs ORDER BY created_at DESC LIMIT ? OFFSET ?',
+  )
     .bind(limit, offset)
     .all();
 

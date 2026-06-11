@@ -16,65 +16,64 @@ const verifyCredentialSchema = z.object({
   credentialId: z.string().uuid(),
 });
 
-credentialRoutes.post(
-  '/issue',
-  zValidator('json', issueCredentialSchema),
-  async (c) => {
-    const data = c.req.valid('json');
-    const id = crypto.randomUUID();
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
+credentialRoutes.post('/issue', zValidator('json', issueCredentialSchema), async (c) => {
+  const data = c.req.valid('json');
+  const id = crypto.randomUUID();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000);
 
-    const credential = {
-      '@context': ['https://www.w3.org/2018/credentials/v1'],
-      type: ['VerifiableCredential', 'AgeVerificationCredential'],
-      issuer: 'did:web:zk-age-gate.example.com',
-      issuanceDate: now.toISOString(),
-      expirationDate: expiresAt.toISOString(),
-      credentialSubject: {
-        id: `did:example:${data.holderId}`,
-        ageVerified: data.ageVerified,
-        minAge: data.minAge,
-        countryCode: data.countryCode,
-      },
-    };
+  const credential = {
+    '@context': ['https://www.w3.org/2018/credentials/v1'],
+    type: ['VerifiableCredential', 'AgeVerificationCredential'],
+    issuer: 'did:web:zk-age-gate.example.com',
+    issuanceDate: now.toISOString(),
+    expirationDate: expiresAt.toISOString(),
+    credentialSubject: {
+      id: `did:example:${data.holderId}`,
+      ageVerified: data.ageVerified,
+      minAge: data.minAge,
+      countryCode: data.countryCode,
+    },
+  };
 
-    await c.env.DB.prepare(
-      'INSERT INTO credentials (id, holder_id, credential_data, status, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?)',
+  await c.env.DB.prepare(
+    'INSERT INTO credentials (id, holder_id, credential_data, status, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?)',
+  )
+    .bind(
+      id,
+      data.holderId,
+      JSON.stringify(credential),
+      'active',
+      now.toISOString(),
+      expiresAt.toISOString(),
     )
-      .bind(id, data.holderId, JSON.stringify(credential), 'active', now.toISOString(), expiresAt.toISOString())
-      .run();
+    .run();
 
-    return c.json({ id, credential }, 201);
-  },
-);
+  return c.json({ id, credential }, 201);
+});
 
-credentialRoutes.post(
-  '/verify',
-  zValidator('json', verifyCredentialSchema),
-  async (c) => {
-    const data = c.req.valid('json');
+credentialRoutes.post('/verify', zValidator('json', verifyCredentialSchema), async (c) => {
+  const data = c.req.valid('json');
 
-    const cred = await c.env.DB.prepare('SELECT * FROM credentials WHERE id = ?')
-      .bind(data.credentialId)
-      .first();
+  const cred = await c.env.DB.prepare('SELECT * FROM credentials WHERE id = ?')
+    .bind(data.credentialId)
+    .first();
 
-    if (!cred) {
-      return c.json({ error: 'Credential not found' }, 404);
-    }
+  if (!cred) {
+    return c.json({ error: 'Credential not found' }, 404);
+  }
 
-    const now = new Date();
-    const expiresAt = new Date(cred.expires_at as string);
-    const isValid = cred.status === 'active' && expiresAt > now;
+  const now = new Date();
+  const expiresAt = new Date(cred.expires_at as string);
+  const isValid = cred.status === 'active' && expiresAt > now;
 
-    return c.json({
-      valid: isValid,
-      credentialId: cred.id,
-      verifiedAt: now.toISOString(),
-      credential: JSON.parse(cred.credential_data as string),
-    });
-  },
-);
+  return c.json({
+    valid: isValid,
+    credentialId: cred.id,
+    verifiedAt: now.toISOString(),
+    credential: JSON.parse(cred.credential_data as string),
+  });
+});
 
 credentialRoutes.get('/:id', async (c) => {
   const id = c.req.param('id');

@@ -1,4 +1,9 @@
-import type { QuantumCircuit, QuantumGate, QuantumProof, QuantumRandomResult } from '../../types/quantum';
+import type {
+  QuantumCircuit,
+  QuantumGate,
+  QuantumProof,
+  QuantumRandomResult,
+} from '../../types/quantum';
 
 export function createAgeVerificationCircuit(minAge: number): QuantumCircuit {
   const gates: QuantumGate[] = [
@@ -84,7 +89,9 @@ export async function simulateCircuit(circuit: QuantumCircuit): Promise<QuantumP
 
   return {
     circuitId: circuit.id,
-    state: Buffer.from(JSON.stringify({ qubits: circuit.qubits, result: classicalBits })).toString('base64'),
+    state: Buffer.from(JSON.stringify({ qubits: circuit.qubits, result: classicalBits })).toString(
+      'base64',
+    ),
     measurement: classicalBits.join(''),
     classicalBits,
   };
