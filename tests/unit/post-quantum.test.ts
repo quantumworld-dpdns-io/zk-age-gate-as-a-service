@@ -13,14 +13,14 @@ describe('Post-Quantum Cryptography', () => {
   describe('generatePQCKeyPair', () => {
     it('should generate Dilithium3 key pair', async () => {
       const { publicKey, privateKey } = await generatePQCKeyPair('DILITHIUM3');
-      expect(publicKey.length).toBe(PQC_ALGORITHMS.DILITHIUM3.publicKeySize);
-      expect(privateKey.length).toBe(PQC_ALGORITHMS.DILITHIUM3.secretKeySize);
+      expect(publicKey.length).toBe(PQC_ALGORITHMS['DILITHIUM3'].publicKeySize);
+      expect(privateKey.length).toBe(PQC_ALGORITHMS['DILITHIUM3'].secretKeySize);
     });
 
     it('should generate Kyber768 key pair', async () => {
       const { publicKey, privateKey } = await generatePQCKeyPair('KYBER768');
-      expect(publicKey.length).toBe(PQC_ALGORITHMS.KYBER768.publicKeySize);
-      expect(privateKey.length).toBe(PQC_ALGORITHMS.KYBER768.secretKeySize);
+      expect(publicKey.length).toBe(PQC_ALGORITHMS['KYBER768'].publicKeySize);
+      expect(privateKey.length).toBe(PQC_ALGORITHMS['KYBER768'].secretKeySize);
     });
   });
 
