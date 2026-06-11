@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { calculateAge, generateProof, verifyProof, listCircuits, getCircuitInfo } from '../../src/lib/zk/proof-engine';
 
 describe('ZK Proof Engine', () => {
