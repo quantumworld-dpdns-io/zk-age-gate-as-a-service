@@ -1,7 +1,7 @@
 import { Context, Next } from 'hono';
 
 export function authenticate() {
-  return async (c: Context, next: Next): Promise<void> => {
+  return async (c: Context, next: Next) => {
     const authHeader = c.req.header('Authorization');
     const apiKey = c.req.header('X-API-Key');
     const sessionId = c.req.header('X-Session-ID');
@@ -48,7 +48,7 @@ export function authenticate() {
 }
 
 export function requireAdmin() {
-  return async (c: Context, next: Next): Promise<void> => {
+  return async (c: Context, next: Next) => {
     const permissions = c.get('permissions') as string[] | undefined;
 
     if (!permissions || !permissions.includes('admin')) {
