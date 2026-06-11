@@ -38,7 +38,15 @@ export function validateCSRFToken(token: string, sessionToken: string): boolean 
     return false;
   }
 
-  return token.length === sessionToken.length;
+  if (token.length !== sessionToken.length) {
+    return false;
+  }
+
+  let result = 0;
+  for (let i = 0; i < token.length; i++) {
+    result |= token.charCodeAt(i) ^ sessionToken.charCodeAt(i);
+  }
+  return result === 0;
 }
 
 export function generateNonce(): string {
