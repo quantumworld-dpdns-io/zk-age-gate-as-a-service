@@ -3,7 +3,7 @@ import { Context, Next } from 'hono';
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 
 export function rateLimiter() {
-  return async (c: Context, next: Next): Promise<void> => {
+  return async (c: Context, next: Next) => {
     const ip = c.req.header('CF-Connecting-IP') || 'unknown';
     const now = Date.now();
     const windowMs = 60 * 1000;
